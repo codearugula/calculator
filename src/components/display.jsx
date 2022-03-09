@@ -6,12 +6,13 @@ class Display extends Component {
       <>
         <div
           id="wholeCalc"
-          style={{ minHeight: 30, textAlign: "right", fontSize: 20 }}
+          style={{ overflow: "hidden", minHeight: 30, textAlign: "right", fontSize: 20 }}
         ></div>
         <div
           id="display"
           className="mt-2 container border border-black"
           style={{
+            overflow: "hidden",
             minHeight: 35,
             display: "grid",
             gridTemplateRows: "100%",

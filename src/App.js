@@ -2,7 +2,6 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import React, { Component } from "react";
 import Display from "./components/display";
 import KeyPad from "./components/keypad";
-import ReactFCCtest from "react-fcctest";
 
 class App extends Component {
   state = {};
@@ -13,10 +12,22 @@ class App extends Component {
   };
 
   handleInput = (id) => {
+    // if wholeCalc includes an "="
+    if (document.getElementById("wholeCalc").innerHTML.includes("=")) {
+      // if input is a number, clear the wholeCalc
+      if (/[0-9]/.test(id)) {
+        document.getElementById("wholeCalc").innerHTML = "";
+      }
+      // else, make wholeCalc equal to just the result
+      else {
+        document.getElementById("wholeCalc").innerHTML =
+          document.getElementById("currentInput").innerHTML;
+      }
+    }
     if (/[0]/.test(id)) {
       // if the currentInput innerHTML is exactly 0, return
       if (/^0$/.test(document.getElementById("currentInput").innerHTML)) {
-        return console.log("there is just a zero");
+        return;
       }
       // if the currentInput innerHTML is 1-9, return put this number next
       if (/\d/.test(document.getElementById("currentInput").innerHTML)) {
@@ -41,24 +52,68 @@ class App extends Component {
       document.getElementById("currentInput").innerHTML += id;
       return (document.getElementById("wholeCalc").innerHTML += id);
     }
-    if (/[*/\-+]/.test(id)) {
+    if (/[*/+]/.test(id)) {
       // if the previous input was also an operator, replace the operator in wholeCalc
-      if (/[*/\-+]/.test(document.getElementById("currentInput").innerHTML)) {
+      if (
+        /[*/+-][*/+-]$/.test(document.getElementById("wholeCalc").innerHTML)
+      ) {
         document.getElementById("wholeCalc").innerHTML = document
           .getElementById("wholeCalc")
           .innerHTML.slice(0, -1);
       }
+      if (/[*/+-]/.test(document.getElementById("currentInput").innerHTML)) {
+        document.getElementById("wholeCalc").innerHTML = document
+          .getElementById("wholeCalc")
+          .innerHTML.slice(0, -1);
+      }
+
       document.getElementById("currentInput").innerHTML = id;
       return (document.getElementById("wholeCalc").innerHTML += id);
+    }
+
+    //tests for '-'
+    //if the input is a '-'
+    if (/[-]/.test(id)) {
+      //if the last two symbols in the "wholeCalc" match /[*/\-+][-]$/, return
+      if (
+        /[*/\-+][*/\-+]$/.test(document.getElementById("wholeCalc").innerHTML)
+      ) {
+        return;
+      }
+      //will need to edit above for this also
+      //change the currentInput to id
+      document.getElementById("currentInput").innerHTML = id;
+      //return change the wholeCalc += id
+      return (document.getElementById("wholeCalc").innerHTML += id);
+      //need to add a test to switch -- to + before eval on handleEqual
+    }
+
+    if (/[.]/.test(id)) {
+      // check to see if there is already a decimal in wholeCalc
+      if (/[.]/.test(document.getElementById("currentInput").innerHTML)) {
+        return;
+      }
+      // if there is, return
+      // if there is not, add a decimal to currentInput and wholeCalc
+      else {
+        document.getElementById("currentInput").innerHTML += id;
+        return (document.getElementById("wholeCalc").innerHTML += id);
+      }
     }
   };
 
   handleEqual = () => {
-    document.getElementById("currentInput").innerHTML = eval(
-      document.getElementById("wholeCalc").innerHTML
-    );
-    return (document.getElementById("wholeCalc").innerHTML +=
-      "=" + eval(document.getElementById("wholeCalc").innerHTML));
+    // if there are two - in a row in the wholeCalc, replace them with a +
+
+    const result = document
+      .getElementById("wholeCalc")
+      .innerHTML.replace(/--/, "+");
+    document.getElementById("wholeCalc").innerHTML = result;
+
+    const myEval = Number(eval(result).toPrecision(10).toString());
+    document.getElementById("currentInput").innerHTML = myEval;
+    document.getElementById("wholeCalc").innerHTML += "=" + myEval;
+    return;
   };
 
   render() {
@@ -67,7 +122,6 @@ class App extends Component {
         className="mt-5 container border border-primary"
         style={{ maxWidth: 500 }}
       >
-        <ReactFCCtest />
         <Display />
         <KeyPad
           clearViews={this.clearViews}
