@@ -1,22 +1,37 @@
 import "bootstrap/dist/css/bootstrap.min.css";
-import React, { Component } from "react";
+import "./App.css";
+import React, { useEffect } from "react";
 import Display from "./components/display";
 import KeyPad from "./components/keypad";
 
-class App extends Component {
-  state = {};
+function App() {
+  useEffect(() => {
+    const onKeyPress = (e) => {
+      if (e.key === "Delete") {
+        clearViews();
+      }
+      e.key === "Enter" ? handleEqual() : handleInput(e.key);
+    };
 
-  clearViews = () => {
+    document.addEventListener("keydown", onKeyPress);
+
+    return () => {
+      document.removeEventListener("keydown", onKeyPress);
+    };
+  }, []);
+
+  const clearViews = () => {
     document.getElementById("currentInput").innerHTML = 0;
     document.getElementById("wholeCalc").innerHTML = "";
   };
 
-  handleInput = (id) => {
+  const handleInput = (id) => {
     // if wholeCalc includes an "="
     if (document.getElementById("wholeCalc").innerHTML.includes("=")) {
       // if input is a number, clear the wholeCalc
       if (/[0-9]/.test(id)) {
         document.getElementById("wholeCalc").innerHTML = "";
+        document.getElementById("currentInput").innerHTML = "";
       }
       // else, make wholeCalc equal to just the result
       else {
@@ -102,7 +117,7 @@ class App extends Component {
     }
   };
 
-  handleEqual = () => {
+  const handleEqual = () => {
     // if there are two - in a row in the wholeCalc, replace them with a +
 
     const result = document
@@ -110,27 +125,31 @@ class App extends Component {
       .innerHTML.replace(/--/, "+");
     document.getElementById("wholeCalc").innerHTML = result;
 
+    // eslint-disable-next-line no-eval
+    try {
+      Number(eval(result).toPrecision(10).toString());
+    } catch {
+      return document.getElementById("currentInput").innerHTML;
+    }
     const myEval = Number(eval(result).toPrecision(10).toString());
     document.getElementById("currentInput").innerHTML = myEval;
     document.getElementById("wholeCalc").innerHTML += "=" + myEval;
     return;
   };
 
-  render() {
-    return (
-      <div
-        className="mt-5 container border border-primary"
-        style={{ maxWidth: 500 }}
-      >
-        <Display />
-        <KeyPad
-          clearViews={this.clearViews}
-          handleInput={this.handleInput}
-          handleEqual={this.handleEqual}
-        />
-      </div>
-    );
-  }
+  return (
+    <div
+      className="mt-5 container border border-primary border-5 rounded bg-dark"
+      style={{ maxWidth: 500 }}
+    >
+      <Display handleInput={handleInput} />
+      <KeyPad
+        clearViews={clearViews}
+        handleInput={handleInput}
+        handleEqual={handleEqual}
+      />
+    </div>
+  );
 }
 
 export default App;

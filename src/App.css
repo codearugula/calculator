@@ -1,0 +1,11 @@
+html {
+  font-size: x-large;
+}
+
+.btn:focus {
+  box-shadow: none;
+}
+
+.btn:hover {
+  background-color: orange;
+}
