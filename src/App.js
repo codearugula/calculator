@@ -123,6 +123,7 @@ function App() {
     const result = document
       .getElementById("wholeCalc")
       .innerHTML.replace(/[*/\-+]$/, "")
+      .replace(/^[*/\\]/, "")
       .replace(/--/, "+");
     document.getElementById("wholeCalc").innerHTML = result;
 
