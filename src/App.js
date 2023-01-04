@@ -122,7 +122,8 @@ function App() {
 
     const result = document
       .getElementById("wholeCalc")
-      .innerHTML.replace(/--/, "+");
+      .innerHTML.replace(/[*/\-+]$/, "")
+      .replace(/--/, "+");
     document.getElementById("wholeCalc").innerHTML = result;
 
     // eslint-disable-next-line no-eval
